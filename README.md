@@ -5,7 +5,7 @@ This is a Golang-based authentication service using the gin-gonic framework and 
 
 Before you begin, make sure you have Go installed on your machine. You can download and install it from the official Go website: [https://golang.org/dl/](https://golang.org/dl/)
 
-### Running the Project
+## Running the Project
 
 To run the authentication service, follow these steps:
 
@@ -23,15 +23,15 @@ To run the authentication service, follow these steps:
    ```
 4. The authentication service should now be running on http://localhost:8080.
 
-### Usage
+## Usage
 
 You can use this authentication service to manage user authentication and JWT generation. Make API requests to endpoints such as /signup, /login, /getUser and /getUsers (example endpoints).
 
-### Contributing
+## Contributing
 
 Contributions are welcome! Feel free to fork this repository, make changes, and submit pull requests.
 
-### License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
