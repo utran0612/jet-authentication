@@ -1,1 +1,1 @@
-# jet-authentication
+# jwt-authentication
