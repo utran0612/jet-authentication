@@ -24,8 +24,7 @@ To run the authentication service, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/auth-service.git
-   cd auth-service
+   git clone https://github.com/utran0612/jwt-authentication.git
    ```
 2. Build and run the application:
    ```bash
