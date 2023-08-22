@@ -180,6 +180,7 @@ func GetUsers() gin.HandlerFunc {
 		startIndex := (page - 1) * recordPerPage
 		startIndex, err = strconv.Atoi(c.Query("startIndex"))
 
+		//Define aggregation pipeline stages
 		matchStage := bson.D{{Key: "$match", Value: bson.D{{}}}}
 		groupStage := bson.D{{Key: "$group", Value: bson.D{
 			{Key: "_id", Value: bson.D{{Key: "_id", Value: "null"}}},
@@ -206,20 +207,6 @@ func GetUsers() gin.HandlerFunc {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusOK, allUsers[0])
-
-		// userId := c.Param("user_id")
-
-		// //check if user is an admin
-		// if err := helper.MatchUserTypeToUid(c, userId); err != nil {
-		// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		// 	return
-		// }
-
-		// var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-
-		// var users []models.User
-		// err := userCollection.Find().Decode(&users)
-		// defer cancel()
 	}
 }
 
