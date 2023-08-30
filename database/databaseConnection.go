@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -12,38 +11,34 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func DBinstance() *mongo.Client {
-	//load the env file
+func DBinstance(ctx context.Context) (*mongo.Client, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		return nil, fmt.Errorf("error loading .env file: %w", err)
 	}
 
 	mongoURL := os.Getenv("MONGODB_URL")
 
-	//create mongoDB client and connect
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(mongoURL))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURL))
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("error connecting to MongoDB: %w", err)
 	}
 
-	//ping the server to ensure the connection was established
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("error pinging MongoDB server: %w", err)
 	}
 
 	fmt.Println("Connected to MongoDB!")
 
-	return client
+	return client, nil
 }
 
-var Client *mongo.Client = DBinstance()
-
 func OpenCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	var collection *mongo.Collection = client.Database("super_cluster").Collection(collectionName)
+	databaseName := "super_cluster"
+	collection := client.Database(databaseName).Collection(collectionName)
 	return collection
 }

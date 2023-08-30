@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -9,7 +10,6 @@ import (
 	"github.com/golang-jwt-project/database"
 	jwt "github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -22,7 +22,8 @@ type SignedDetails struct {
 	jwt.StandardClaims
 }
 
-var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
+//var client, err = database.DBinstance(ctx)
+//var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
 
 var SECRET_KEY string = os.Getenv("SECRET_KEY")
 
@@ -61,24 +62,24 @@ func GenerateAllTokens(email string, firstName string, lastName string, userType
 	return token, refreshToken, err
 }
 
-func ValidateToken(signedToken string) (claims *SignedDetails, msg string){
-	token, err := jwt.ParseWithClaims(signedToken, &SignedDetails{}, func(token *jwt.Token)(interface{}, err){
-		return []byte(SECRET_KEY),nil
+func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
+	token, err := jwt.ParseWithClaims(signedToken, &SignedDetails{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(SECRET_KEY), nil
 	})
 
 	if err != nil {
 		msg := err.Error()
-		return
+		return nil, msg
 	}
 
 	claims, ok := token.Claims.(*SignedDetails)
 	if !ok {
 		msg = fmt.Sprintf("the token is invalid")
 		msg = err.Error()
-		return 
+		return
 	}
 
-	if claims.ExpiresAt < time.Now().Local().Unix(){
+	if claims.ExpiresAt < time.Now().Local().Unix() {
 		msg = fmt.Sprintf("token is expired")
 		msg = err.Error()
 		return
@@ -99,7 +100,10 @@ func UpdateAllTokens(signedToken, signedRefreshToken, userId string) error {
 	}
 	update := bson.D{{"$set", updateObj}}
 
-	_, err := userCollection.UpdateOne(ctx, filter, update, &opt)
+	client, err := database.DBinstance(ctx)
+	userCollection := database.OpenCollection(client, "user")
+
+	_, err = userCollection.UpdateOne(ctx, filter, update, &opt)
 	if err != nil {
 		log.Panic(err)
 		return err
